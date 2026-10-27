@@ -41,7 +41,29 @@ def cargar_eventos(db: Database, ruta: Path, lote: int = 500) -> int:
     una mayoría de miembros tenga el lote. No hace falta repetirlo aquí, pero en el
     informe debe poder explicar qué esperó cada llamada.
     """
-    raise NotImplementedError("TODO 1: cargar_eventos")
+    documentos = []
+    total = 0
+
+    # Se lee el JSONL linea por linea sin guardar todo el archivo en memoria.
+    with ruta.open("r", encoding="utf-8") as archivo:
+        for linea in archivo:
+            if not linea.strip():
+                continue
+
+            documentos.append(json.loads(linea))
+
+            # Insertar el lote cuando alcance el tamano indicado.
+            if len(documentos) == lote:
+                resultado = db.eventos.insert_many(documentos, ordered=False)
+                total += len(resultado.inserted_ids)
+                documentos = []
+
+    # Se insertan los documentos que quedan en el ultimo lote.
+    if documentos:
+        resultado = db.eventos.insert_many(documentos, ordered=False)
+        total += len(resultado.inserted_ids)
+
+    return total
 
 
 def crear_indices(db: Database) -> list[str]:
