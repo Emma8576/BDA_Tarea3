@@ -48,7 +48,24 @@ def calcular_rpo(
 
     Son operaciones entre conjuntos: no necesita ciclos.
     """
-    raise NotImplementedError("TODO 5: calcular_rpo")
+    # Operaciones que se confirmaron, pero no aparecen en la base.
+    perdidos = confirmados - presentes
+
+    # Operaciones que dieron error, pero si se guardaron.
+    desconocidos_presentes = sin_confirmar & presentes
+
+    # Operaciones que dieron error y no se guardaron.
+    desconocidos_ausentes = sin_confirmar - presentes
+
+    # Operaciones presentes que no aparecen entre los intentos.
+    inesperados = presentes - (confirmados | sin_confirmar)
+
+    return {
+        "perdidos": perdidos,
+        "desconocidos_presentes": desconocidos_presentes,
+        "desconocidos_ausentes": desconocidos_ausentes,
+        "inesperados": inesperados
+    }
 
 
 def autotest() -> int:
