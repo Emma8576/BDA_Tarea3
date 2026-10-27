@@ -63,7 +63,19 @@ def crear_indices(db: Database) -> list[str]:
 
     Use ``create_index`` con una lista de pares ``(campo, ASCENDING)``.
     """
-    raise NotImplementedError("TODO 2: crear_indices")
+    # Indice para buscar eventos por categoria y fecha.
+    indice_eventos = db.eventos.create_index([
+        ("categoria", ASCENDING),
+        ("fecha", ASCENDING)
+    ])
+
+    # Indice para buscar ordenes de un evento segun su estado.
+    indice_ordenes = db.ordenes.create_index([
+        ("evento_id", ASCENDING),
+        ("estado", ASCENDING)
+    ])
+
+    return [indice_eventos, indice_ordenes]
 
 
 def verificar_carga(db: Database, devueltos: int, m: dict) -> bool:
