@@ -16,6 +16,7 @@ printjson(
 );
 
 // == A1: Creación del índice compuesto ==
+// Primero van los filtros de igualdad (categoria, ciudad) y al final el rango por fecha.
 db.eventos.createIndex({ categoria: 1, ciudad: 1, fecha: 1 });
 
 // == A1: Con índice (Explain final y resultados) ==
@@ -43,6 +44,8 @@ db.eventos.find(
 
 
 // == A2 =================================================================
+// $elemMatch exige que nombre VIP y precio menor a 48000 estén en la misma zona.
+// También se usa en la proyección para mostrar solo la zona que cumple.
 print("== A2 ==");
 db.eventos.find(
   {
@@ -76,6 +79,7 @@ printjson(
 );
 
 // == A2: Sin $elemMatch (Para comparar la cantidad de documentos) ==
+// Sin $elemMatch, las dos condiciones podrían cumplirse en zonas diferentes.
 print("== A2 Sin $elemMatch (Conteo) ==");
 printjson(
   db.eventos.countDocuments({
@@ -86,6 +90,7 @@ printjson(
 
 
 // == A3 =================================================================
+// Busca la etiqueta accesible y excluye las categorias teatro y conferencia con $nin.
 print("== A3 ==");
 db.eventos.find(
   {
@@ -97,6 +102,7 @@ db.eventos.find(
 
 
 // == A4 =================================================================
+// $exists: false deja solo eventos sin patrocinador; $group cuenta por categoria.
 print("== A4 ==");
 db.eventos.aggregate([
   { $match: { patrocinador: { $exists: false } } },
@@ -106,6 +112,7 @@ db.eventos.aggregate([
 
 
 // == A5 =================================================================
+// $unwind separa las zonas para sumar sus capacidades por ciudad con $group.
 print("== A5 ==");
 db.eventos.aggregate([
   { $unwind: "$zonas" },
